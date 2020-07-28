@@ -197,7 +197,7 @@ def del_lockables(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
 
-    for lockable in LOCK_TYPES.items():
+    for lockable, filter in LOCK_TYPES.items(): # It's need two argument.
         if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
@@ -226,7 +226,7 @@ def del_lockables(bot: Bot, update: Update):
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
-    for restriction in RESTRICTION_TYPES.items():
+    for restriction, filter in RESTRICTION_TYPES.items(): # needs two argument.
         if filter(msg) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
             try:
                 msg.delete()
@@ -311,10 +311,10 @@ Do stickers annoy you? or want to avoid people sharing links? or pictures? You'r
 The locks module allows you to lock away some common items in the telegram world; the bot will automatically delete them!
 
 Available commands are:
- - /lock <item(s)>: lock the usage of "item". Now, only admins will be able to use this type!
- - /unlock <item(s)>: unlock "item". Everyone can use them again.
- - /locks: list the lock status in the chat.
- - /locktypes: gets a list of all things that can be locked. (have a look at this!)
+ • /lock <item(s)>: lock the usage of "item". Now, only admins will be able to use this type!
+ • /unlock <item(s)>: unlock "item". Everyone can use them again.
+ • /locks: list the lock status in the chat.
+ • /locktypes: gets a list of all things that can be locked. (have a look at this!)
 
 eg: lock stickers with:
 /lock sticker
