@@ -1,6 +1,4 @@
-import logging
-import os
-import sys
+import logging, os, sys
 
 import telegram.ext as tg
 
@@ -12,8 +10,8 @@ logging.basicConfig(
 LOGGER = logging.getLogger(__name__)
 
 # if version < 3.6, stop bot.
-if sys.version_info[0] < 3 or sys.version_info[1] < 6:
-    LOGGER.error("You MUST have a python version of at least 3.6! Multiple features depend on this. Bot quitting.")
+if sys.version_info[0] < 3 or sys.version_info[1] < 8:
+    LOGGER.error("You MUST have a python version of at least 3.8! Multiple features depend on this. Bot quitting.")
     quit(1)
 
 ENV = bool(os.environ.get('ENV', False))
@@ -45,16 +43,16 @@ if ENV:
 
     WEBHOOK = bool(os.environ.get('WEBHOOK', False))
     URL = os.environ.get('URL', "")  # Does not contain token
-    PORT = int(os.environ.get('PORT', 5000))
+    PORT = int(os.environ.get('PORT', 8443))
     CERT_PATH = os.environ.get("CERT_PATH")
 
     DB_URI = os.environ.get('DATABASE_URL')
     DONATION_LINK = os.environ.get('DONATION_LINK')
     LOAD = os.environ.get("LOAD", "").split()
-    NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
-    DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
-    STRICT_ANTISPAM = bool(os.environ.get('STRICT_GBAN', False))
-    WORKERS = int(os.environ.get('WORKERS', 8))
+    NO_LOAD = os.environ.get("NO_LOAD", "").split()
+    DEL_CMDS = bool(os.environ.get('DEL_CMDS', True))
+    STRICT_ANTISPAM = bool(os.environ.get('STRICT_ANTISPAM', True))
+    WORKERS = int(os.environ.get('WORKERS', 4))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     API_WEATHER = os.environ.get('API_WEATHER', None)
@@ -88,16 +86,16 @@ else:
 
     WEBHOOK = bool(os.environ.get('WEBHOOK', False))
     URL = os.environ.get('URL', "")  # Does not contain token
-    PORT = int(os.environ.get('PORT', 5000))
+    PORT = int(os.environ.get('PORT', 8443))
     CERT_PATH = os.environ.get("CERT_PATH")
 
     DB_URI = os.environ.get('DATABASE_URL')
     DONATION_LINK = os.environ.get('DONATION_LINK')
     LOAD = os.environ.get("LOAD", "").split()
-    NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
-    DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
-    STRICT_ANTISPAM = bool(os.environ.get('STRICT_GBAN', False))
-    WORKERS = int(os.environ.get('WORKERS', 8))
+    NO_LOAD = os.environ.get("NO_LOAD", "").split()
+    DEL_CMDS = bool(os.environ.get('DEL_CMDS', True))
+    STRICT_ANTISPAM = bool(os.environ.get('STRICT_ANTISPAM', True))
+    WORKERS = int(os.environ.get('WORKERS', 4))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     API_WEATHER = os.environ.get('API_WEATHER', None)
