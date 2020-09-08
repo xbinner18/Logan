@@ -61,15 +61,16 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
           "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title), mention_html(user.id, user.first_name), 
                                                   mention_html(member.user.id, member.user.first_name), user_id)
 
-    reply = "🔨 Banned {}\nwith the ban hammer".format(mention_html(member.user.id, member.user.first_name))
+    reply = f"User {mention_html(member.user.id, member.user.first_name)} has been banned in <b>{chat.title}</b>!"
 
     if reason:
         log += "\n<b>Reason:</b> {}".format(reason)
+        reply += f"\n<b>Reason:</b> {reason}"
 
     try:
         chat.kick_member(user_id)
         keyboard = []
-        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
         return log
 
@@ -300,7 +301,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     chat.unban_member(user_id)
-    message.reply_text("Yeeah Now He or she can join again")
+    message.reply_text("User has been Unbanned")
 
     log = "<b>{}:</b>" \
           "\n#UNBANNED" \
