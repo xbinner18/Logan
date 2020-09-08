@@ -1,11 +1,4 @@
-if not __name__.endswith("sample_config"):
-    import sys
-    print("The README is there to be read. Extend this sample config to a config file, don't just rename and change "
-          "values here. Doing that WILL backfire on you.\nBot quitting.", file=sys.stderr)
-    quit(1)
-
-
-# Create a new config.py file in same dir and import, then extend this class.
+import sys
 class Config(object):
     LOGGER = True
 
@@ -16,7 +9,7 @@ class Config(object):
 
     # RECOMMENDED
     SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'  # needed for any database modules
-    MESSAGE_DUMP = None  # needed to make sure 'save from' messages persist
+    MESSAGE_DUMP = None  # needed to make gban logs and etc.
     LOAD = []
     NO_LOAD = []
     WEBHOOK = False
@@ -28,9 +21,8 @@ class Config(object):
     WHITELIST_USERS = []  # List of id's (not usernames) for users which WONT be banned/kicked by the bot.
     MAPS_API = ''
     CERT_PATH = None
-    PORT = 9001
-    DEL_CMDS = False  # Whether or not you should delete "blue text must click" commands
-    STRICT_ANTISPAM = False
+    PORT = 8443
+    DEL_CMDS = True # Whether or not you should delete "blue text must click" commands
     WORKERS = 4  # Number of subthreads to use. This is the recommended amount - see for yourself what works best!
     BAN_STICKER = 'CAADAgADOwADPPEcAXkko5EB3YGYAg'  # banhammer marie sticker
     STRICT_ANTISPAM = True 
