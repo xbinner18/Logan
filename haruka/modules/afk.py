@@ -30,7 +30,7 @@ def afk(bot: Bot, update: Update):
 
     sql.set_afk(update.effective_user.id, reason)
     fname = update.effective_user.first_name
-    update.effective_message.reply_text(tld(chat.id, f"{fname} is now AFK!"))
+    update.effective_message.reply_text(tld(chat.id, f"User {fname} is now AFK!"))
 
 
 @run_async
@@ -45,7 +45,7 @@ def no_longer_afk(bot: Bot, update: Update):
     if res:
         firstname = update.effective_user.first_name
         try:
-            update.effective_message.reply_text(tld(chat.id, f"{firstname} is no longer AFK!"))
+            update.effective_message.reply_text(tld(chat.id, f"User {firstname} is no longer AFK!"))
         except:
             return
 
@@ -94,19 +94,13 @@ def check_afk(bot, update, user_id, fst_name):
     if sql.is_afk(user_id):
         user = sql.check_afk_status(user_id)
         if not user.reason:
-            res = tld(chat.id, f"{fst_name} is AFK!")
+            res = tld(chat.id, f"User {fst_name} is AFK!")
         else:
-            res = tld(chat.id, f"{fst_name} is AFK! says its because of:\n{user.reason}")
+            res = tld(chat.id, f"User {fst_name} is AFK! says its because of:\n{user.reason}")
         update.effective_message.reply_text(res)
 
 
-__help__ = """
- - /afk <reason>: mark yourself as AFK.
- - brb <reason>: same as the afk command - but not a command.
-
-When marked as AFK, any mentions will be replied to with a message to say that you're not available!
-"""
-
+__help__ = ""
 __mod_name__ = "AFK"
 
 AFK_HANDLER = DisableAbleCommandHandler("afk", afk)
