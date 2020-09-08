@@ -190,7 +190,7 @@ def __import_data__(chat_id, data):
         sql.add_to_blacklist(chat_id, trigger)
 
 
-__mod_name__ = "Word Blacklists"
+__mod_name__ = "Blacklist"
 
 __help__ = """
 You can set blacklist filters to take automatic action on people when they say certain things. This is done using:
@@ -198,6 +198,9 @@ You can set blacklist filters to take automatic action on people when they say c
  - /unblacklist <blacklist trigger>: stop blacklisting a certain blacklist trigger.
  - /rmblacklist <blacklist trigger>: same as /unblacklist
  - /blacklist: list all active blacklist filters
+ 
+ - /addurl <urls>: Add a domain to the blacklist. The bot will automatically parse the url.
+- /delurl <urls>: Remove urls from the blacklist
 
 /addblacklist "the admins suck" Respect your admins!
 This would delete any message containing 'the admins suck'.
