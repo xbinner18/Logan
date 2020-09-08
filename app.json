@@ -1,5 +1,5 @@
 {
-  "name": "Wolverine",
+  "name": "Logan",
   "description": "Telegram's sassiest group manager. Modular Telegram group management bot!",
   "keywords": [
     "telegram",
@@ -30,26 +30,22 @@
       "description": "Setting this to ANYTHING will enable webhooks when in env mode messages",
       "value": "ANYTHING"
     },
-    "URL": {
-      "description": "The Heroku App URL similar to https://<appname>.herokuapp.com/",
-      "value": ""
-    },
     "MESSAGE_DUMP": {
       "description": "optional: a chat where your replied saved messages are stored, to stop people deleting their old",
       "value": "",
-      "required": false
+      "required": true # for antispam module and logs..
     },
     "SUDO_USERS": {
       "description": "A space separated list of user_ids which should be considered sudo users",
-      "value": "ID OF SUDOS"
+      "value": "777000"
     },
     "SUPPORT_USERS": {
       "description": "A space separated list of user_ids which should be considered support users (can gban/ungban, nothing else)",
-      "value": "same as SUDO var"
+      "value": "777000"
     },
     "WHITELIST_USERS": {
       "description": "A space separated list of user_ids which should be considered whitelisted - they can't be banned.",
-      "value": "same"
+      "value": "777000"
     },
     "DONATION_LINK": {
       "description": "Optional: link where you would like to receive donations.",
@@ -57,7 +53,7 @@
     },
     "PORT": {
       "description": "Port to use for your webhooks",
-      "value": "9001"
+      "value": "8443"
     },
     "DEL_CMDS": {
       "description": "Whether to delete commands from users which don't have rights to use that command",
@@ -81,7 +77,7 @@
     {
       "plan": "heroku-postgresql",
       "options": {
-        "version": "9.5"
+        "version": "12.4"
       }
     }
   ]
