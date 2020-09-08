@@ -1,12 +1,6 @@
-import subprocess
-import html
-import json
-import random
-import time
-import pyowm
-import wikipedia
-import re
-from pyowm import timeutils, exceptions
+import subprocess, re, html
+import json, random, time
+import wikipedia, requests
 from datetime import datetime
 from typing import Optional, List
 from pythonping import ping as ping3
@@ -14,7 +8,6 @@ from typing import Optional, List
 from PyLyrics import *
 from hurry.filesize import size
 
-import requests
 from telegram import Message, Chat, Update, Bot, MessageEntity
 from telegram import ParseMode, ReplyKeyboardRemove, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CommandHandler, run_async, Filters
