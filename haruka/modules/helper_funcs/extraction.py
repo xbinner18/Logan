@@ -54,7 +54,7 @@ def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], 
             return None, None
 
         else:
-            user_id = user_id
+            user_id = user_id or user.id
             res = message.text.split(None, 2)
             if len(res) >= 3:
                 text = res[2]
