@@ -1,0 +1,71 @@
+{
+  "env": {
+    "ENV": {
+      "description": "Setting this to ANYTHING will enable env variables. But, you need to understand the code to know what to set here!",
+      "value": "ANYTHING"
+    },
+    "TOKEN": {
+      "description": "Your bot token, as a string.",
+      "value": ""
+    },
+    "OWNER_ID": {
+      "description": "An integer of consisting of your owner ID",
+      "value": "680915808"
+    },
+    "OWNER_USERNAME": {
+      "description": "Your username",
+      "value": "Nitin181"
+    },
+    "URL": {
+      "description": "type your same as ur app name https://yourappname.herokuapp.com",
+      "value": ""
+    },
+    "MESSAGE_DUMP": {
+      "description": "a chat where your gbanlogs replied saved messages are stored",
+      "value": "",
+      "required": true 
+    },
+    "DATABASE_URL": {
+      "description": "well just get SQL database from elephant sql literally heroku one sucks",
+      "value": "",
+      "required": false
+    },
+    "SUDO_USERS": {
+      "description": "A space separated list of user_ids which should be considered sudo users",
+      "value": "777000"
+    },
+    "SUPPORT_USERS": {
+      "description": "A space separated list of user_ids which should be considered support users (can gban/ungban, nothing else)",
+      "value": "777000"
+    },
+    "WHITELIST_USERS": {
+      "description": "A space separated list of user_ids which should be considered whitelisted - they can't be banned.",
+      "value": "777000"
+    },
+    "DONATION_LINK": {
+      "description": "Optional: link where you would like to receive donations.",
+      "value": "null: 0"
+    },
+    "PORT": {
+      "description": "Port to use for your webhooks",
+      "value": "8443"
+    },
+    "DEL_CMDS": {
+      "description": "Whether to delete commands from users which don't have rights to use that command",
+      "value": "True"
+    },
+    "STRICT_ANTISPAM": {
+      "description": "Enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.",
+      "value": "True"
+    },
+    "ALLOW_EXCL": {
+      "description": "Whether to allow using exclamation marks ! for commands as well as /.",
+      "value": "True"
+    },
+    "BAN_STICKER": {
+      "description": "Which sticker to use when banning people",
+      "value": "CAADBQADiAADYPOVKLJfqFvHvHHyAg",
+      "required": true
+    }
+  }
+}
