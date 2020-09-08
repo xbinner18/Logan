@@ -1,14 +1,4 @@
 {
-  "name": "Logan",
-  "description": "Telegram's sassiest group manager. Modular Telegram group management bot!",
-  "keywords": [
-    "telegram",
-    "best",
-    "group",
-    "manager",
-    "3"
-  ],
-  "repository": "https://github.com/Nitin1818/Logan",
   "env": {
     "ENV": {
       "description": "Setting this to ANYTHING will enable env variables. But, you need to understand the code to know what to set here!",
@@ -26,14 +16,19 @@
       "description": "Your username",
       "value": "Nitin181"
     },
-    "WEBHOOK": {
-      "description": "Setting this to ANYTHING will enable webhooks when in env mode messages",
-      "value": "ANYTHING"
+    "URL": {
+      "description": "type your same as ur app name https://yourappname.herokuapp.com",
+      "value": ""
     },
     "MESSAGE_DUMP": {
-      "description": "required: a chat where your gbanlogs replied saved messages are stored",
+      "description": "a chat where your gbanlogs replied saved messages are stored",
       "value": "",
       "required": true 
+    },
+    "DATABASE_URL": {
+      "description": "well just get SQL database from elephant sql literally heroku one sucks",
+      "value": "",
+      "required": false
     },
     "SUDO_USERS": {
       "description": "A space separated list of user_ids which should be considered sudo users",
@@ -72,25 +67,5 @@
       "value": "CAADBQADiAADYPOVKLJfqFvHvHHyAg",
       "required": true
     }
-  },
-  "addons": [
-    {
-      "plan": "heroku-postgresql",
-      "options": {
-        "version": "12.4"
-      }
-    }
-  ]
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
