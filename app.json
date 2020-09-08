@@ -31,9 +31,9 @@
       "value": "ANYTHING"
     },
     "MESSAGE_DUMP": {
-      "description": "optional: a chat where your replied saved messages are stored, to stop people deleting their old",
+      "description": "required: a chat where your gbanlogs replied saved messages are stored",
       "value": "",
-      "required": true # for antispam module and logs..
+      "required": true 
     },
     "SUDO_USERS": {
       "description": "A space separated list of user_ids which should be considered sudo users",
@@ -68,8 +68,8 @@
       "value": "True"
     },
     "BAN_STICKER": {
-      "description": "Which sticker to use when banning people. Use https://telegram.dog/ShowJsonBot to get the file_id",
-      "value": "",
+      "description": "Which sticker to use when banning people",
+      "value": "CAADBQADiAADYPOVKLJfqFvHvHHyAg",
       "required": true
     }
   },
