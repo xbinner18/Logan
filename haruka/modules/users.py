@@ -62,7 +62,7 @@ def broadcast(bot: Bot, update: Update):
         failed = 0
         for chat in chats:
             try:
-                bot.sendMessage(int(chat.chat_id), to_send[1])
+                bot.sendMessage(int(chat.chat_id), to_send[1], parse_mode="markdown")
                 sleep(0.1)
             except TelegramError:
                 failed += 1
@@ -74,8 +74,8 @@ def broadcast(bot: Bot, update: Update):
 
 @run_async
 def log_user(bot: Bot, update: Update):
-    chat = update.effective_chat  # type: Optional[Chat]
-    msg = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  
+    msg = update.effective_message  
 
     sql.update_user(msg.from_user.id,
                     msg.from_user.username,
