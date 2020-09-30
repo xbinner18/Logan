@@ -47,9 +47,9 @@ class GbanLockHandler(tg.CommandHandler):
             message = update.message or update.edited_message
             if sql.is_user_gbanned(update.effective_user.id):
                 return False
-            if message.text and message.text.startswith('/') and len(message.text) > 1:
+            if message.text and len(message.text) > 1:
                 first_word = message.text_html.split(None, 1)[0]
-                if len(first_word) > 1 and first_word.startswith('/'):
+                if len(first_word) > 1 and any(first_word.startswith(start) for start in CMD_STARTERS):
                     command = first_word[1:].split('@')
                     command.append(message.bot.username)  # in case the command was sent without a username
                     if not (command[0].lower() in self.command and command[1].lower() == message.bot.username.lower()):
@@ -60,5 +60,8 @@ class GbanLockHandler(tg.CommandHandler):
                         res = any(func(message) for func in self.filters)
                     else:
                         res = self.filters(message)
-                return res
+
+                    return res and (command[0].lower() in self.command
+                                    and command[1].lower() == message.bot.username.lower())
+                    
         return False
