@@ -1,11 +1,7 @@
-import html
+import html, re, json
 from io import BytesIO
 from typing import Optional, List
-import random
-import uuid
-import re
-import json
-import time
+import random, uuid, time
 from time import sleep
 
 from future.utils import string_types
@@ -95,7 +91,7 @@ def new_fed(bot: Bot, update: Update):
 											"\n`/joinfed {}`".format(fed_name, fed_id, fed_id), parse_mode=ParseMode.MARKDOWN)
 		try:
 			bot.send_message(MESSAGE_DUMP,
-				"Federation <b>{}</b> have been created with ID: <pre>{}</pre>".format(fed_name, fed_id), parse_mode=ParseMode.HTML)
+				"Federation <b>{}</b> have been created with ID: <pre>{}</pre> by <code>{}</code>".format(fed_name, fed_id, user.id), parse_mode=ParseMode.HTML)
 		except:
 			LOGGER.warning("Cannot send a message to MESSAGE_DUMP")
 	else:
@@ -139,10 +135,6 @@ def fed_chat(bot: Bot, update: Update, args: List[str]):
 	fed_id = sql.get_fed_id(chat.id)
 
 	user_id = update.effective_message.from_user.id
-	if not is_user_admin(update.effective_chat, user_id):
-		update.effective_message.reply_text("You must be an admin to execute this command")
-		return
-
 	if not fed_id:
 		update.effective_message.reply_text("This group is not in any federation!")
 		return
@@ -306,10 +298,6 @@ def fed_info(bot: Bot, update: Update, args: List[str]):
 		update.effective_message.reply_text("This group is not in any federation!")
 		return
 
-	if is_user_fed_admin(fed_id, user.id) == False:
-		update.effective_message.reply_text("Only a federation admin can do this!")
-		return
-
 	owner = bot.get_chat(info['owner'])
 	try:
 		owner_name = owner.first_name + " " + owner.last_name
@@ -343,10 +331,6 @@ def fed_admin(bot: Bot, update: Update, args: List[str]):
 
 	if not fed_id:
 		update.effective_message.reply_text("This group is not in any federation!")
-		return
-
-	if is_user_fed_admin(fed_id, user.id) == False:
-		update.effective_message.reply_text("Only federation admins can do this!")
 		return
 
 	user = update.effective_user  # type: Optional[Chat]
@@ -1235,15 +1219,15 @@ JOIN_FED_HANDLER = CommandHandler("joinfed", join_fed, pass_args=True)
 LEAVE_FED_HANDLER = CommandHandler("leavefed", leave_fed, pass_args=True)
 PROMOTE_FED_HANDLER = CommandHandler("fpromote", user_join_fed, pass_args=True)
 DEMOTE_FED_HANDLER = CommandHandler("fdemote", user_demote_fed, pass_args=True)
-INFO_FED_HANDLER = CommandHandler("fedinfo", fed_info, pass_args=True)
+INFO_FED_HANDLER = DisableAbleCommandHandler(["fedinfo", "finfo"], fed_info, pass_args=True)
 BAN_FED_HANDLER = DisableAbleCommandHandler(["fban", "fedban"], fed_ban, pass_args=True)
 UN_BAN_FED_HANDLER = CommandHandler("unfban", unfban, pass_args=True)
 FED_BROADCAST_HANDLER = CommandHandler("fbroadcast", fed_broadcast, pass_args=True)
 FED_SET_RULES_HANDLER = CommandHandler("setfrules", set_frules, pass_args=True)
 FEDSTAT_USER = DisableAbleCommandHandler(["fedstat", "fbanstat"], fed_stat_user, pass_args=True)
-FED_GET_RULES_HANDLER = CommandHandler("frules", get_frules, pass_args=True)
+FED_GET_RULES_HANDLER = DisableAbleCommandHandler(["frules", "fedrules"], get_frules, pass_args=True)
 FED_CHAT_HANDLER = CommandHandler("chatfed", fed_chat, pass_args=True)
-FED_ADMIN_HANDLER = CommandHandler("fedadmins", fed_admin, pass_args=True)
+FED_ADMIN_HANDLER = DisableAbleCommandHandler(["fedadmins", "fadmins"], fed_admin, pass_args=True)
 FED_USERBAN_HANDLER = CommandHandler("fbanlist", fed_ban_list, pass_args=True, pass_chat_data=True)
 FED_NOTIF_HANDLER = CommandHandler("fednotif", fed_notif, pass_args=True)
 FED_CHATLIST_HANDLER = CommandHandler("fedchats", fed_chats, pass_args=True)
@@ -1270,5 +1254,4 @@ dispatcher.add_handler(FED_USERBAN_HANDLER)
 # dispatcher.add_handler(FED_NOTIF_HANDLER)
 dispatcher.add_handler(FED_CHATLIST_HANDLER)
 dispatcher.add_handler(FED_IMPORTBAN_HANDLER)
-
 dispatcher.add_handler(DELETEBTN_FED_HANDLER)
