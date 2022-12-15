@@ -15,7 +15,7 @@ class CommandReactionChatSettings(BASE):
         self.chat_id = str(chat_id)
 
     def __repr__(self):
-        return "<Chat report settings ({})>".format(self.chat_id)
+        return f"<Chat report settings ({self.chat_id})>"
 
 CommandReactionChatSettings.__table__.create(checkfirst=True)
 
@@ -23,8 +23,9 @@ CHAT_LOCK = threading.RLock()
 
 def command_reaction(chat_id: Union[str, int]) -> bool:
     try:
-        chat_setting = SESSION.query(CommandReactionChatSettings).get(str(chat_id))
-        if chat_setting:
+        if chat_setting := SESSION.query(CommandReactionChatSettings).get(
+            str(chat_id)
+        ):
             return chat_setting.comm_reaction
         return False
     finally:

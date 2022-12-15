@@ -21,17 +21,17 @@ def locale(bot, update, args):
                 switch_to_locale(chat.id, locale)
                 update.message.reply_text(tld(chat.id, 'Switched to {} successfully!').format(list_locales[locale]))
             else:
-                update.message.reply_text("{} is not supported yet!".format(list_locales[locale]))
+                update.message.reply_text(f"{list_locales[locale]} is not supported yet!")
         else:
             update.message.reply_text("Is that even a valid language code? Use an internationally accepted ISO code!")
+    elif LANGUAGE := prev_locale(chat.id):
+        native_lang = list_locales[LANGUAGE.locale_name]
+        update.message.reply_text(
+            f"Current locale for this chat is: *{native_lang}*",
+            parse_mode=ParseMode.MARKDOWN,
+        )
     else:
-        LANGUAGE = prev_locale(chat.id)
-        if LANGUAGE:
-            locale = LANGUAGE.locale_name
-            native_lang = list_locales[locale]
-            update.message.reply_text("Current locale for this chat is: *{}*".format(native_lang), parse_mode = ParseMode.MARKDOWN)
-        else:
-            update.message.reply_text("Current locale for this chat is: *English*", parse_mode=ParseMode.MARKDOWN)
+        update.message.reply_text("Current locale for this chat is: *English*", parse_mode=ParseMode.MARKDOWN)
 
 @user_admin
 def locale_button(bot, update):
@@ -53,16 +53,14 @@ def locale_button(bot, update):
     except:
         curr_lang = "English"
 
-    text = "*Select language* \n"
-    text += "User language : `{}`".format(curr_lang)
-
+    text = "*Select language* \n" + f"User language : `{curr_lang}`"
     conn = connected(bot, update, chat, user.id, need_admin=False)
 
-    if not conn == False:
+    if conn != False:
         try:
             chatlng = prev_locale(conn).locale_name
             chatlng = list_locales[chatlng]
-            text += "\nConnected chat language : `{}`".format(chatlng)
+            text += f"\nConnected chat language : `{chatlng}`"
         except:
             chatlng = "English"
 

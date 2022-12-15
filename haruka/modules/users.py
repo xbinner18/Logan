@@ -46,9 +46,7 @@ def get_user_id(username):
                     return userdat.id
 
             except BadRequest as excp:
-                if excp.message == 'Chat not found':
-                    pass
-                else:
+                if excp.message != 'Chat not found':
                     LOGGER.exception("Error extracting user ID")
 
     return None
@@ -68,8 +66,9 @@ def broadcast(bot: Bot, update: Update):
                 failed += 1
                 LOGGER.warning("Couldn't send broadcast to %s, group name %s", str(chat.chat_id), str(chat.chat_name))
 
-        update.effective_message.reply_text("Broadcast complete. {} groups failed to receive the message, probably "
-                                            "due to being kicked.".format(failed))
+        update.effective_message.reply_text(
+            f"Broadcast complete. {failed} groups failed to receive the message, probably due to being kicked."
+        )
 
 
 @run_async
@@ -107,7 +106,7 @@ def chats(bot: Bot, update: Update):
                 invitelink = bot.exportChatInviteLink(chat.chat_id)
             else:
                 invitelink = "0"
-            chatfile += "{}. {} | {} | {} | {}\n".format(P, chat.chat_name, chat.chat_id, chat_members, invitelink)
+            chatfile += f"{P}. {chat.chat_name} | {chat.chat_id} | {chat_members} | {invitelink}\n"
             P = P + 1
         except:
             pass
@@ -120,19 +119,15 @@ def chats(bot: Bot, update: Update):
 
 @run_async
 def banall(bot: Bot, update: Update, args: List[int]):
-    if args:
-        chat_id = str(args[0])
-        all_mems = sql.get_chat_members(chat_id)
-    else:
-        chat_id = str(update.effective_chat.id)
-        all_mems = sql.get_chat_members(chat_id)
+    chat_id = str(args[0]) if args else str(update.effective_chat.id)
+    all_mems = sql.get_chat_members(chat_id)
     for mems in all_mems:
         try:
             bot.kick_chat_member(chat_id, mems.user)
-            update.effective_message.reply_text("Tried banning " + str(mems.user))
+            update.effective_message.reply_text(f"Tried banning {str(mems.user)}")
             sleep(0.1)
         except BadRequest as excp:
-            update.effective_message.reply_text(excp.message + " " + str(mems.user))
+            update.effective_message.reply_text(f"{excp.message} {str(mems.user)}")
             continue
 
 
@@ -146,9 +141,9 @@ def snipe(bot: Bot, update: Update, args: List[str]):
     to_send = " ".join(args)
     if len(to_send) >= 2:
         try:
-            bot.sendMessage(int(chat_id), str(to_send))
+            bot.sendMessage(int(chat_id), to_send)
         except TelegramError:
-            LOGGER.warning("Couldn't send to group %s", str(chat_id))
+            LOGGER.warning("Couldn't send to group %s", chat_id)
             update.effective_message.reply_text("Couldn't send the message. Perhaps I'm not part of that group?")
 
 
@@ -189,7 +184,7 @@ def leavechat(bot: Bot, update: Update, args: List[int]):
         titlechat = bot.get_chat(chat_id).title
         bot.sendMessage(chat_id, "`I'll Go Away!`")
         bot.leaveChat(chat_id)
-        update.effective_message.reply_text("I'll left group {}".format(titlechat))
+        update.effective_message.reply_text(f"I'll left group {titlechat}")
 
     except BadRequest as excp:
         if excp.message == "Chat not found":
@@ -206,23 +201,23 @@ def slist(bot: Bot, update: Update):
     for user_id in SUDO_USERS:
         try:
             user = bot.get_chat(user_id)
-            name = "[{}](tg://user?id={})".format(user.first_name + (user.last_name or ""), user.id)
+            name = f'[{user.first_name + (user.last_name or "")}](tg://user?id={user.id})'
             if user.username:
-                name = escape_markdown("@" + user.username)
-            text1 += "\n - `{}`".format(name)
+                name = escape_markdown(f"@{user.username}")
+            text1 += f"\n - `{name}`"
         except BadRequest as excp:
             if excp.message == 'Chat not found':
-                text1 += "\n - ({}) - not found".format(user_id)
+                text1 += f"\n - ({user_id}) - not found"
     for user_id in SUPPORT_USERS:
         try:
             user = bot.get_chat(user_id)
-            name = "[{}](tg://user?id={})".format(user.first_name + (user.last_name or ""), user.id)
+            name = f'[{user.first_name + (user.last_name or "")}](tg://user?id={user.id})'
             if user.username:
-                name = escape_markdown("@" + user.username)
-            text2 += "\n - `{}`".format(name)
+                name = escape_markdown(f"@{user.username}")
+            text2 += f"\n - `{name}`"
         except BadRequest as excp:
             if excp.message == 'Chat not found':
-                text2 += "\n - ({}) - not found".format(user_id)
+                text2 += f"\n - ({user_id}) - not found"
     message.reply_text(text1 + "\n" + text2 + "\n", parse_mode=ParseMode.MARKDOWN)
     #message.reply_text(text2 + "\n", parse_mode=ParseMode.MARKDOWN)
 
@@ -235,7 +230,7 @@ def __user_info__(user_id, chat_id):
 
 
 def __stats__():
-    return "{} users, across {} chats".format(sql.num_users(), sql.num_chats())
+    return f"{sql.num_users()} users, across {sql.num_chats()} chats"
 
 
 def __gdpr__(user_id):

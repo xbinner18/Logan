@@ -65,9 +65,9 @@ def import_data(bot: Bot, update):
 
 		# Check if backup is this chat
 		try:
-			if data.get(str(chat.id)) == None:
+			if data.get(str(chat.id)) is None:
 				if conn:
-					text = "Backup comes from another chat, I can't return another chat to chat *{}*".format(chat_name)
+					text = f"Backup comes from another chat, I can't return another chat to chat *{chat_name}*"
 				else:
 					text = "Backup comes from another chat, I can't return another chat to this chat"
 				return msg.reply_text(text, parse_mode="markdown")
@@ -99,7 +99,7 @@ def import_data(bot: Bot, update):
 		if conn:
 
 
-			text = "Backup fully restored on *{}*.".format(chat_name)
+			text = f"Backup fully restored on *{chat_name}*."
 		else:
 			text = "Backup fully restored"
 		msg.reply_text(text, parse_mode="markdown")

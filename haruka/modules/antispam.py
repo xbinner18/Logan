@@ -89,59 +89,12 @@ def gban(bot: Bot, update: Update, args: List[str]):
         old_reason = sql.update_gban_reason(user_id, user_chat.username or user_chat.first_name, reason)
         user_id, new_reason = extract_user_and_text(message, args)
 
-        if old_reason:
-            banner = update.effective_user  # type: Optional[User]
-            bannerid = banner.id
-
-            if int(bannerid) == int(172811422) or int(214416808):
-                return
-
-            bannername = banner.first_name
-            new_reason = f"{new_reason} // GBanned by {bannername} id {bannerid}"
-
-            bot.send_message(
-                MESSAGE_DUMP,
-                     "<b>New Reason of Global Ban</b>" \
-                     "\n<b>Sudo Admin:</b> {}" \
-                     "\n<b>User:</b> {}" \
-                     "\n<b>ID:</b> <code>{}</code>" \
-                     "\n<b>Previous Reason:</b> {}" \
-                     "\n<b>New Reason:</b> {}".format(mention_html(banner.id, banner.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
-                                                           user_chat.id, old_reason, new_reason), 
-                parse_mode=ParseMode.HTML
-            )
-
-            message.reply_text("This user is already gbanned, for the following reason:\n"
-                               "<code>{}</code>\n"
-                               "I've gone and updated it with your new reason!".format(html.escape(old_reason)),
-                               parse_mode=ParseMode.HTML)
-        else:
-            banner = update.effective_user  # type: Optional[User]
-            bannerid = banner.id
-
-            if int(bannerid) == int(172811422) or int(214416808):
-                return
-
-            bannername = banner.first_name
-            new_reason = f"{new_reason} // GBanned by {bannername} id {bannerid}"
-
-            bot.send_message(
-                MESSAGE_DUMP,
-                     "<b>New reason of Global Ban</b>" \
-                     "\n<b>Sudo Admin:</b> {}" \
-                     "\n<b>User:</b> {}" \
-                     "\n<b>ID:</b> <code>{}</code>" \
-                     "\n<b>New Reason:</b> {}".format(mention_html(banner.id, banner.first_name or "Deleted Account"),
-                                              mention_html(user_chat.id, user_chat.first_name), 
-                                                           user_chat.id, new_reason), 
-                parse_mode=ParseMode.HTML
-            )
-            message.reply_text("This user is already gbanned, but had no reason set; I've gone and updated it!")
+        banner = update.effective_user  # type: Optional[User]
+        bannerid = banner.id
 
         return
 
-    starting = "Global Banning {} with the id <code>{}</code>".format(mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), user_chat.id)
+    starting = f'Global Banning {mention_html(user_chat.id, user_chat.first_name or "Deleted Account")} with the id <code>{user_chat.id}</code>'
     message.reply_text(starting, parse_mode=ParseMode.HTML)
 
     banner = update.effective_user  # type: Optional[User]
@@ -151,20 +104,16 @@ def gban(bot: Bot, update: Update, args: List[str]):
     try:
         bot.send_message(
             MESSAGE_DUMP,
-                     "{} is gbanning user {} with the id <code>{}</code> "
-                     "because:\n{}".format(mention_html(banner.id, banner.first_name),
-                                           mention_html(user_chat.id, user_chat.first_name), user_chat.id, reason or "No reason given"),
-                      parse_mode=ParseMode.HTML
-            )
+            f'{mention_html(banner.id, banner.first_name)} is gbanning user {mention_html(user_chat.id, user_chat.first_name)} with the id <code>{user_chat.id}</code> because:\n{reason or "No reason given"}',
+            parse_mode=ParseMode.HTML,
+        )
     except:
         print("nut")
 
     sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
 
     try:
-        if int(bannerid) == int(172811422) or int(214416808):
-            return
-        bot.kick_chat_member(user_id, chat.id)
+        return
     except:
         print("Meh")
 
@@ -215,12 +164,15 @@ def ungban(bot: Bot, update: Update, args: List[str]):
 
     banner = update.effective_user  # type: Optional[User]
 
-    message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
+    message.reply_text(
+        f"I'll give {user_chat.first_name} a second chance, globally."
+    )
 
-    bot.send_message(MESSAGE_DUMP,
-                 "{} has ungbanned user {}".format(mention_html(banner.id, banner.first_name),
-                                                   mention_html(user_chat.id, user_chat.first_name)),
-                 parse_mode=ParseMode.HTML)
+    bot.send_message(
+        MESSAGE_DUMP,
+        f"{mention_html(banner.id, banner.first_name)} has ungbanned user {mention_html(user_chat.id, user_chat.first_name)}",
+        parse_mode=ParseMode.HTML,
+    )
 
     chats = get_all_chats()
     for chat in chats:
@@ -236,11 +188,9 @@ def ungban(bot: Bot, update: Update, args: List[str]):
                 bot.unban_chat_member(chat_id, user_id)
 
         except BadRequest as excp:
-            if excp.message in UNGBAN_ERRORS:
-                pass
-            else:
-                message.reply_text("Could not un-gban due to: {}".format(excp.message))
-                bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
+            if excp.message not in UNGBAN_ERRORS:
+                message.reply_text(f"Could not un-gban due to: {excp.message}")
+                bot.send_message(OWNER_ID, f"Could not un-gban due to: {excp.message}")
                 return
         except TelegramError:
             pass
@@ -262,9 +212,9 @@ def gbanlist(bot: Bot, update: Update):
 
     banfile = 'Screw these guys.\n'
     for user in banned_users:
-        banfile += "[x] {} • {}\n".format(user["name"], user["user_id"])
+        banfile += f'[x] {user["name"]} • {user["user_id"]}\n'
         if user["reason"]:
-            banfile += "Reason: {}\n".format(user["reason"])
+            banfile += f'Reason: {user["reason"]}\n'
 
     with BytesIO(str.encode(banfile)) as output:
         output.name = "gbanlist.txt"
@@ -313,7 +263,7 @@ def enforce_gban(bot: Bot, update: Update):
 @user_admin
 def antispam(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
-    if len(args) > 0:
+    if args:
         if args[0].lower() in ["on", "yes"]:
             sql.enable_antispam(chat.id)
             update.effective_message.reply_text(tld(chat.id, "I've enabled antispam security in this group. This will help to protect you "
@@ -332,27 +282,25 @@ def antispam(bot: Bot, update: Update, args: List[str]):
 
 
 def __stats__():
-    return "{} gbanned users.".format(sql.num_gbanned_users())
+    return f"{sql.num_gbanned_users()} gbanned users."
 
 
 def __user_info__(user_id, chat_id):
     is_gbanned = sql.is_user_gbanned(user_id)
     is_gmuted = sql.is_user_gmuted(user_id)
 
-    if not user_id in SUDO_USERS:
-
-        text = tld(chat_id, "Globally banned: <b>{}</b>")
-        if is_gbanned:
-            text = text.format(tld(chat_id, "Yes"))
-            user = sql.get_gbanned_user(user_id)
-            if user.reason:
-                text += tld(chat_id, "\nReason: {}").format(html.escape(user.reason))
-        else:
-            text = text.format(tld(chat_id, "No"))
-
-        return text
-    else:
+    if user_id in SUDO_USERS:
         return ""
+    text = tld(chat_id, "Globally banned: <b>{}</b>")
+    if is_gbanned:
+        text = text.format(tld(chat_id, "Yes"))
+        user = sql.get_gbanned_user(user_id)
+        if user.reason:
+            text += tld(chat_id, "\nReason: {}").format(html.escape(user.reason))
+    else:
+        text = text.format(tld(chat_id, "No"))
+
+    return text
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -361,7 +309,7 @@ def __migrate__(old_chat_id, new_chat_id):
 
 def __chat_settings__(bot, update, chat, chatP, user):
     chat_id = chat.id
-    return "This chat is enforcing *gbans*: `{}`.".format(sql.does_chat_gban(chat_id))
+    return f"This chat is enforcing *gbans*: `{sql.does_chat_gban(chat_id)}`."
 
 
 __help__ = """

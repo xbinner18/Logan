@@ -25,28 +25,27 @@ def blacklist(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
-    
+
     conn = connected(bot, update, chat, user.id, need_admin=False)
-    if not conn == False:
+    if conn != False:
         chat_id = conn
         chat_name = dispatcher.bot.getChat(conn).title
+    elif chat.type == "private":
+        exit(1)
     else:
-        if chat.type == "private":
-            exit(1)
-        else:
-            chat_id = update.effective_chat.id
-            chat_name = chat.title
-    
+        chat_id = update.effective_chat.id
+        chat_name = chat.title
+
     filter_list = tld(chat.id, "<b>Current blacklisted words in {}:</b>\n").format(chat_name)
 
     all_blacklisted = sql.get_chat_blacklist(chat_id)
 
-    if len(args) > 0 and args[0].lower() == 'copy':
+    if args and args[0].lower() == 'copy':
         for trigger in all_blacklisted:
-            filter_list += "<code>{}</code>\n".format(html.escape(trigger))
+            filter_list += f"<code>{html.escape(trigger)}</code>\n"
     else:
         for trigger in all_blacklisted:
-            filter_list += " • <code>{}</code>\n".format(html.escape(trigger))
+            filter_list += f" • <code>{html.escape(trigger)}</code>\n"
 
     split_text = split_message(filter_list)
     for text in split_text:
@@ -65,7 +64,7 @@ def add_blacklist(bot: Bot, update: Update):
     words = msg.text.split(None, 1)
 
     conn = connected(bot, update, chat, user.id)
-    if not conn == False:
+    if conn != False:
         chat_id = conn
         chat_name = dispatcher.bot.getChat(conn).title
     else:
@@ -77,7 +76,13 @@ def add_blacklist(bot: Bot, update: Update):
 
     if len(words) > 1:
         text = words[1]
-        to_blacklist = list(set(trigger.strip() for trigger in text.split("\n") if trigger.strip()))
+        to_blacklist = list(
+            {
+                trigger.strip()
+                for trigger in text.split("\n")
+                if trigger.strip()
+            }
+        )
         for trigger in to_blacklist:
             sql.add_to_blacklist(chat_id, trigger.lower())
 
@@ -102,7 +107,7 @@ def unblacklist(bot: Bot, update: Update):
     words = msg.text.split(None, 1)
 
     conn = connected(bot, update, chat, user.id)
-    if not conn == False:
+    if conn != False:
         chat_id = conn
         chat_name = dispatcher.bot.getChat(conn).title
     else:
@@ -114,7 +119,13 @@ def unblacklist(bot: Bot, update: Update):
 
     if len(words) > 1:
         text = words[1]
-        to_unblacklist = list(set(trigger.strip() for trigger in text.split("\n") if trigger.strip()))
+        to_unblacklist = list(
+            {
+                trigger.strip()
+                for trigger in text.split("\n")
+                if trigger.strip()
+            }
+        )
         successful = 0
         for trigger in to_unblacklist:
             success = sql.rm_from_blacklist(chat_id, trigger.lower())
@@ -163,9 +174,7 @@ def del_blacklist(bot: Bot, update: Update):
             try:
                 message.delete()
             except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
+                if excp.message != "Message to delete not found":
                     LOGGER.exception("Error while deleting blacklist message.")
             break
 
@@ -176,12 +185,11 @@ def __migrate__(old_chat_id, new_chat_id):
 
 def __chat_settings__(bot, update, chat, chatP, user):
     blacklisted = sql.num_blacklist_chat_filters(chat.id)
-    return "There are {} blacklisted words.".format(blacklisted)
+    return f"There are {blacklisted} blacklisted words."
 
 
 def __stats__():
-    return "{} blacklist triggers, across {} chats.".format(sql.num_blacklist_filters(),
-                                                            sql.num_blacklist_filter_chats())
+    return f"{sql.num_blacklist_filters()} blacklist triggers, across {sql.num_blacklist_filter_chats()} chats."
 
 def __import_data__(chat_id, data):
     # set chat blacklist

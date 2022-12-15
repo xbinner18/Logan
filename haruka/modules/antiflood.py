@@ -40,18 +40,12 @@ def check_flood(bot: Bot, update: Update) -> str:
         msg.reply_text(tld(chat.id, "I like to leave the flooding to natural disasters. But you, you were just a "
                        "disappointment. *Muted*!"))
 
-        return "<b>{}:</b>" \
-               "\n#MUTED" \
-               "\n<b>User:</b> {}" \
-               "\nFlooded the group.".format(html.escape(chat.title),
-                                             mention_html(user.id, user.first_name))
+        return f"<b>{html.escape(chat.title)}:</b>\n#MUTED\n<b>User:</b> {mention_html(user.id, user.first_name)}\nFlooded the group."
 
     except BadRequest:
         msg.reply_text(tld(chat.id, "I can't mute people here, give me permissions first! Until then, I'll disable antiflood."))
         sql.set_flood(chat.id, 0)
-        return "<b>{}:</b>" \
-               "\n#INFO" \
-               "\nDon't have mute permissions, so automatically disabled antiflood.".format(chat.title)
+        return f"<b>{chat.title}:</b>\n#INFO\nDon't have mute permissions, so automatically disabled antiflood."
 
 
 @run_async
@@ -60,12 +54,12 @@ def check_flood(bot: Bot, update: Update) -> str:
 @loggable
 def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
-    user = update.effective_user  # type: Optional[User]
-    message = update.effective_message  # type: Optional[Message]
-
-    if len(args) >= 1:
+    if args:
         val = args[0].lower()
-        if val == "off" or val == "no" or val == "0":
+        user = update.effective_user  # type: Optional[User]
+        message = update.effective_message  # type: Optional[Message]
+
+        if val in ["off", "no", "0"]:
             sql.set_flood(chat.id, 0)
             message.reply_text(tld(chat.id, "Antiflood has been disabled."))
 
@@ -74,10 +68,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             if amount <= 0:
                 sql.set_flood(chat.id, 0)
                 message.reply_text(tld(chat.id,  "Antiflood has been disabled."))
-                return "<b>{}:</b>" \
-                       "\n#SETFLOOD" \
-                       "\n<b>Admin:</b> {}" \
-                       "\nDisabled antiflood.".format(html.escape(chat.title), mention_html(user.id, user.first_name))
+                return f"<b>{html.escape(chat.title)}:</b>\n#SETFLOOD\n<b>Admin:</b> {mention_html(user.id, user.first_name)}\nDisabled antiflood."
 
             elif amount < 3:
                 message.reply_text(tld(chat.id, "Antiflood has to be either 0 (disabled), or a number bigger than 3 (enabled)!"))
@@ -86,11 +77,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             else:
                 sql.set_flood(chat.id, amount)
                 message.reply_text(tld(chat.id, "Antiflood has been updated and set to {}").format(amount))
-                return "<b>{}:</b>" \
-                       "\n#SETFLOOD" \
-                       "\n<b>Admin:</b> {}" \
-                       "\nSet antiflood to <code>{}</code>.".format(html.escape(chat.title),
-                                                                    mention_html(user.id, user.first_name), amount)
+                return f"<b>{html.escape(chat.title)}:</b>\n#SETFLOOD\n<b>Admin:</b> {mention_html(user.id, user.first_name)}\nSet antiflood to <code>{amount}</code>."
 
         else:
             message.reply_text(tld(chat.id, "Unrecognized argument - please use a number, 'off', or 'no'."))
@@ -120,7 +107,7 @@ def __chat_settings__(bot, update, chat, chatP, user):
     if limit == 0:
         return "*Not* currently enforcing flood control."
     else:
-        return "Antiflood is set to `{}` messages.".format(limit)
+        return f"Antiflood is set to `{limit}` messages."
 
 
 __help__ = """
