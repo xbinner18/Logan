@@ -43,7 +43,7 @@ class Permissions(BASE):
         self.location = False
 
     def __repr__(self):
-        return "<Permissions for %s>" % self.chat_id
+        return f"<Permissions for {self.chat_id}>"
 
 
 class Restrictions(BASE):
@@ -63,7 +63,7 @@ class Restrictions(BASE):
         self.preview = False
 
     def __repr__(self):
-        return "<Restrictions for %s>" % self.chat_id
+        return f"<Restrictions for {self.chat_id}>"
 
 
 Permissions.__table__.create(checkfirst=True)
@@ -230,13 +230,11 @@ def get_restr(chat_id):
 
 def migrate_chat(old_chat_id, new_chat_id):
     with PERM_LOCK:
-        perms = SESSION.query(Permissions).get(str(old_chat_id))
-        if perms:
+        if perms := SESSION.query(Permissions).get(str(old_chat_id)):
             perms.chat_id = str(new_chat_id)
         SESSION.commit()
 
     with RESTR_LOCK:
-        rest = SESSION.query(Restrictions).get(str(old_chat_id))
-        if rest:
+        if rest := SESSION.query(Restrictions).get(str(old_chat_id)):
             rest.chat_id = str(new_chat_id)
         SESSION.commit()

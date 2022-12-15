@@ -57,23 +57,20 @@ def slap(bot: Bot, update: Update, args: List[str]):
 
     # get user who sent message
     if msg.from_user.username:
-        curr_user = "@" + escape_markdown(msg.from_user.username)
+        curr_user = f"@{escape_markdown(msg.from_user.username)}"
     else:
-        curr_user = "[{}](tg://user?id={})".format(msg.from_user.first_name, msg.from_user.id)
+        curr_user = f"[{msg.from_user.first_name}](tg://user?id={msg.from_user.id})"
 
-    user_id = extract_user(update.effective_message, args)
-    if user_id:
+    if user_id := extract_user(update.effective_message, args):
         slapped_user = bot.get_chat(user_id)
         user1 = curr_user
         if slapped_user.username:
-            user2 = "@" + escape_markdown(slapped_user.username)
+            user2 = f"@{escape_markdown(slapped_user.username)}"
         else:
-            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                                   slapped_user.id)
+            user2 = f"[{slapped_user.first_name}](tg://user?id={slapped_user.id})"
 
-    # if no target found, bot targets the sender
     else:
-        user1 = "[{}](tg://user?id={})".format(bot.first_name, bot.id)
+        user1 = f"[{bot.first_name}](tg://user?id={bot.id})"
         user2 = curr_user
 
     temp = random.choice(tld(chat.id, "SLAP_TEMPLATES-K"))
@@ -152,7 +149,7 @@ def info(bot: Bot, update: Update, args: List[str]):
         return
 
     text =  tld(chat.id, "<b>User info</b>:")
-    text += "\nID: <code>{}</code>".format(user.id)
+    text += f"\nID: <code>{user.id}</code>"
     text += tld(chat.id, "\nFirst Name: {}").format(html.escape(user.first_name))
 
     if user.last_name:
@@ -166,7 +163,7 @@ def info(bot: Bot, update: Update, args: List[str]):
     if user.id == OWNER_ID:
         text += tld(chat.id, "\n\nAy, This guy is my owner. I would never do anything against him!")
     else:
-        if user.id == int(254318997):
+        if user.id == 254318997:
             text += tld(chat.id, "\nThis person.... He is my god.")
 
         if user.id in SUDO_USERS:
@@ -182,8 +179,7 @@ def info(bot: Bot, update: Update, args: List[str]):
                         "That means I'm not allowed to ban/kick them.")
 
     for mod in USER_INFO:
-        mod_info = mod.__user_info__(user.id, chat.id).strip()
-        if mod_info:
+        if mod_info := mod.__user_info__(user.id, chat.id).strip():
             text += "\n\n" + mod_info
 
     update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
@@ -203,12 +199,7 @@ def echo(bot: Bot, update: Update):
 @user_is_gbanned
 @run_async
 def reply_keyboard_remove(bot: Bot, update: Update):
-    reply_keyboard = []
-    reply_keyboard.append([
-        ReplyKeyboardRemove(
-            remove_keyboard=True
-        )
-    ])
+    reply_keyboard = [[ReplyKeyboardRemove(remove_keyboard=True)]]
     reply_markup = ReplyKeyboardRemove(
         remove_keyboard=True
     )
@@ -255,13 +246,12 @@ def ping(bot: Bot, update: Update):
     tg_api = ping3('api.telegram.org', count=4)
     google = ping3('google.com', count=4)
     print(google)
-    text = "*Pong!*\n"
-    text += "Average speed to Telegram bot API server - `{}` ms\n".format(tg_api.rtt_avg_ms)
-    if google.rtt_avg:
-        gspeed = google.rtt_avg
-    else:
-        gspeed = google.rtt_avg
-    text += "Average speed to Google - `{}` ms".format(gspeed)
+    text = (
+        "*Pong!*\n"
+        + f"Average speed to Telegram bot API server - `{tg_api.rtt_avg_ms}` ms\n"
+    )
+    gspeed = google.rtt_avg
+    text += f"Average speed to Google - `{gspeed}` ms"
     update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
 #def google(bot: Bot, update: Update):
@@ -292,21 +282,17 @@ def github(bot: Bot, update: Update):
 
         for x, y in usr.items():
             if x in whitelist:
-                if x in difnames:
-                    x = difnames[x]
-                else:
-                    x = x.title()
-
-                if x == 'Account created at' or x == 'Last updated':
+                x = difnames[x] if x in difnames else x.title()
+                if x in ['Account created at', 'Last updated']:
                     y = datetime.strptime(y, "%Y-%m-%dT%H:%M:%SZ")
 
                 if y not in goaway:
                     if x == 'Blog':
                         x = "Website"
                         y = f"[Here!]({y})"
-                        text += ("\n*{}:* {}".format(x, y))
+                        text += f"\n*{x}:* {y}"
                     else:
-                        text += ("\n*{}:* `{}`".format(x, y))
+                        text += f"\n*{x}:* `{y}`"
         reply_text = text
     else:
         reply_text = "User not found. Make sure you entered valid username!"
@@ -334,28 +320,29 @@ def lyrics(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message
     text = message.text[len('/lyrics '):]
     song = " ".join(args).split("- ")
-    reply_text = f'Looks up for lyrics'
-    
-    if len(song) == 2:
-        while song[1].startswith(" "):
-            song[1] = song[1][1:]
-        while song[0].startswith(" "):
-            song[0] = song[0][1:]
-        while song[1].endswith(" "):
-            song[1] = song[1][:-1]
-        while song[0].endswith(" "):
-            song[0] = song[0][:-1]
-        try:
-            lyrics = "\n".join(PyLyrics.getLyrics(
-                song[0], song[1]).split("\n")[:20])
-        except ValueError as e:
-            return update.effective_message.reply_text("Song %s not found :(" % song[1], failed=True)
-        else:
-            lyricstext = LYRICSINFO % (song[0].replace(
-                " ", "_"), song[1].replace(" ", "_"))
-            return update.effective_message.reply_text(lyrics + lyricstext, parse_mode="MARKDOWN")
-    else:
+    reply_text = 'Looks up for lyrics'
+
+    if len(song) != 2:
         return update.effective_message.reply_text("Invalid syntax! Try Artist - Song name .For example, Luis Fonsi - Despacito", failed=True)
+    while song[1].startswith(" "):
+        song[1] = song[1][1:]
+    while song[0].startswith(" "):
+        song[0] = song[0][1:]
+    while song[1].endswith(" "):
+        song[1] = song[1][:-1]
+    while song[0].endswith(" "):
+        song[0] = song[0][:-1]
+    try:
+        lyrics = "\n".join(PyLyrics.getLyrics(
+            song[0], song[1]).split("\n")[:20])
+    except ValueError as e:
+        return update.effective_message.reply_text(
+            f"Song {song[1]} not found :(", failed=True
+        )
+    else:
+        lyricstext = LYRICSINFO % (song[0].replace(
+            " ", "_"), song[1].replace(" ", "_"))
+        return update.effective_message.reply_text(lyrics + lyricstext, parse_mode="MARKDOWN")
 
 
 BASE_URL = 'https://del.dog'
@@ -399,7 +386,7 @@ def paste(bot: Bot, update: Update, args: List[str]):
 def get_paste_content(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message
 
-    if len(args) >= 1:
+    if args:
         key = args[0]
     else:
         message.reply_text("Please supply a paste key!")
@@ -426,7 +413,9 @@ def get_paste_content(bot: Bot, update: Update, args: List[str]):
                 update.effective_message.reply_text('Unknown error occured')
         r.raise_for_status()
 
-    update.effective_message.reply_text('```' + escape_markdown(r.text) + '```', parse_mode=ParseMode.MARKDOWN)
+    update.effective_message.reply_text(
+        f'```{escape_markdown(r.text)}```', parse_mode=ParseMode.MARKDOWN
+    )
 
 
 @user_is_gbanned
@@ -434,7 +423,7 @@ def get_paste_content(bot: Bot, update: Update, args: List[str]):
 def get_paste_stats(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message
 
-    if len(args) >= 1:
+    if args:
         key = args[0]
     else:
         message.reply_text("Please supply a paste key!")
@@ -488,12 +477,15 @@ def execute(bot: Bot, update: Update, args: List[str]):
 
     if not regex:
         available_languages = ', '.join(languages.keys())
-        message.reply_text('*The availale languages are:*\n`{}`'.format(available_languages), parse_mode=ParseMode.MARKDOWN)
+        message.reply_text(
+            f'*The availale languages are:*\n`{available_languages}`',
+            parse_mode=ParseMode.MARKDOWN,
+        )
         return
 
-    language = regex.group(1)
-    code = regex.group(2)
-    stdin = regex.group(3)
+    language = regex[1]
+    code = regex[2]
+    stdin = regex[3]
 
     try:
         regexter = Rextester(language, code, stdin)
@@ -501,18 +493,17 @@ def execute(bot: Bot, update: Update, args: List[str]):
         message.reply_text(exc)
         return
 
-    output = ""
-    output += "*Language:*\n`{}`".format(language)
-    output += "*\n\nSource:*\n`{}`".format(code)
+    output = f"*Language:*\n`{language}`"
+    output += f"*\n\nSource:*\n`{code}`"
 
     if regexter.result:
-        output += "*\n\nResult:*\n`{}`".format(regexter.result)
+        output += f"*\n\nResult:*\n`{regexter.result}`"
 
     if regexter.warnings:
-        output += "\n\n*Warnings:*\n`{}`\n".format(regexter.warnings)
+        output += f"\n\n*Warnings:*\n`{regexter.warnings}`\n"
 
     if regexter.errors:
-        output += "\n\n*Errors:*\n'{}`".format(regexter.errors)
+        output += f"\n\n*Errors:*\n'{regexter.errors}`"
 
     message.reply_text(output, parse_mode=ParseMode.MARKDOWN)
 
@@ -522,7 +513,7 @@ def execute(bot: Bot, update: Update, args: List[str]):
 def wiki(bot: Bot, update: Update):
     kueri = re.split(pattern="wiki", string=update.effective_message.text)
     wikipedia.set_lang("en")
-    if len(str(kueri[1])) == 0:
+    if not str(kueri[1]):
         update.effective_message.reply_text("Enter keywords!")
     else:
         try:

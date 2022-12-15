@@ -23,11 +23,7 @@ def afk(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     if user.id == 777000:  # ignore channels
         return
-    if len(args) >= 2:
-        reason = args[1]
-    else:
-        reason = ""
-
+    reason = args[1] if len(args) >= 2 else ""
     sql.set_afk(update.effective_user.id, reason)
     fname = update.effective_user.first_name
     update.effective_message.reply_text(tld(chat.id, f"User {fname} is now AFK!"))
@@ -41,8 +37,7 @@ def no_longer_afk(bot: Bot, update: Update):
     if user.id == 777000:  # ignore channels
         return
 
-    res = sql.rm_afk(user.id)
-    if res:
+    if res := sql.rm_afk(user.id):
         firstname = update.effective_user.first_name
         try:
             update.effective_message.reply_text(tld(chat.id, f"User {firstname} is no longer AFK!"))
@@ -71,7 +66,7 @@ def reply_afk(bot: Bot, update: Update):
                 try:
                     chat = bot.get_chat(user_id)
                 except BadRequest:
-                    print("Error: Could not fetch userid {} for AFK module".format(user_id))
+                    print(f"Error: Could not fetch userid {user_id} for AFK module")
                     return
                 fst_name = chat.first_name
 
@@ -93,10 +88,14 @@ def check_afk(bot, update, user_id, fst_name):
         return
     if sql.is_afk(user_id):
         user = sql.check_afk_status(user_id)
-        if not user.reason:
-            res = tld(chat.id, f"User {fst_name} is AFK!")
-        else:
-            res = tld(chat.id, f"User {fst_name} is AFK! says its because of:\n{user.reason}")
+        res = (
+            tld(
+                chat.id,
+                f"User {fst_name} is AFK! says its because of:\n{user.reason}",
+            )
+            if user.reason
+            else tld(chat.id, f"User {fst_name} is AFK!")
+        )
         update.effective_message.reply_text(res)
 
 

@@ -23,8 +23,8 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
         if can_delete(chat, bot.id):
             message_id = msg.reply_to_message.message_id
             if args and args[0].isdigit():
-                if int(args[0]) < int(1):
-                     return
+                if int(args[0]) < 1:
+                    return
 
                 delete_to = message_id + int(args[0])
             else:
@@ -51,12 +51,7 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
                     LOGGER.exception("Error while purging chat messages.")
 
             bot.send_message(chat.id, "Purge complete.")
-            return "<b>{}:</b>" \
-                   "\n#PURGE" \
-                   "\n<b>• Admin:</b> {}" \
-                   "\nPurged <code>{}</code> messages.".format(html.escape(chat.title),
-                                                               mention_html(user.id, user.first_name),
-                                                               delete_to - message_id)
+            return f"<b>{html.escape(chat.title)}:</b>\n#PURGE\n<b>• Admin:</b> {mention_html(user.id, user.first_name)}\nPurged <code>{delete_to - message_id}</code> messages."
 
     else:
         msg.reply_text("Reply to a message to select where to start purging from.")
@@ -74,11 +69,7 @@ def del_message(bot: Bot, update: Update) -> str:
         if can_delete(chat, bot.id):
             update.effective_message.reply_to_message.delete()
             update.effective_message.delete()
-            return "<b>{}:</b>" \
-                   "\n#DEL" \
-                   "\n<b>• Admin:</b> {}" \
-                   "\nMessage deleted.".format(html.escape(chat.title),
-                                               mention_html(user.id, user.first_name))
+            return f"<b>{html.escape(chat.title)}:</b>\n#DEL\n<b>• Admin:</b> {mention_html(user.id, user.first_name)}\nMessage deleted."
     else:
         update.effective_message.reply_text("Whadya want to delete?")
 

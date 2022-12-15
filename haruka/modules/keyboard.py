@@ -14,7 +14,7 @@ import haruka.modules.sql.connection_sql as con_sql
 def keyboard(bot, update):
     user = update.effective_user  # type: Optional[User]
     conn_id = con_sql.get_connected_chat(user.id)
-    if conn_id and not conn_id == False:
+    if conn_id and conn_id != False:
         btn1 = "/disconnect - Disconnect from chat"
         btn2 = ""
         btn3 = ""
@@ -37,19 +37,12 @@ def keyboard(bot, update):
             chat_name3 = ""
 
         if chat_name1:
-            btn1 = "/connect {} - {}".format(history.chat_id1, chat_name1)
+            btn1 = f"/connect {history.chat_id1} - {chat_name1}"
         else:
             btn1 = "/connect - Connect to the chat"
-        if chat_name2:
-            btn2 = "/connect {} - {}".format(history.chat_id2, chat_name2)
-        else:
-            btn2 = ""
-        if chat_name3:
-            btn3 = "/connect {} - {}".format(history.chat_id3, chat_name3)
-        else:
-            btn3 = ""
-
-        #TODO: Remove except garbage
+        btn2 = f"/connect {history.chat_id2} - {chat_name2}" if chat_name2 else ""
+        btn3 = f"/connect {history.chat_id3} - {chat_name3}" if chat_name3 else ""
+            #TODO: Remove except garbage
 
     update.effective_message.reply_text("Keyboard Updated",
                                             reply_markup=ReplyKeyboardMarkup([[

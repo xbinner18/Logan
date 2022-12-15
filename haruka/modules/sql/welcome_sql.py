@@ -31,7 +31,7 @@ class Welcome(BASE):
         self.should_goodbye = should_goodbye
 
     def __repr__(self):
-        return "<Chat {} should Welcome new users: {}>".format(self.chat_id, self.should_welcome)
+        return f"<Chat {self.chat_id} should Welcome new users: {self.should_welcome}>"
 
 
 class WelcomeButtons(BASE):
@@ -73,7 +73,7 @@ class CleanServiceSetting(BASE):
         self.chat_id = str(chat_id)
 
     def __repr__(self):
-        return "<Chat used clean service ({})>".format(self.chat_id)
+        return f"<Chat used clean service ({self.chat_id})>"
 
 
 class WelcomeSecurity(BASE):
@@ -99,12 +99,14 @@ class UserRestirect(BASE):
         self.user_id = user_id
 
     def __repr__(self):
-        return "<User restirect '%s' in %s>" % (self.user_id, self.chat_id)
+        return f"<User restirect '{self.user_id}' in {self.chat_id}>"
 
     def __eq__(self, other):
-        return bool(isinstance(other, UserRestirect)
-                    and self.chat_id == other.chat_id
-                    and self.user_id == other.user_id)
+        return (
+            isinstance(other, UserRestirect)
+            and self.chat_id == other.chat_id
+            and self.user_id == other.user_id
+        )
 
 
 Welcome.__table__.create(checkfirst=True)
@@ -139,8 +141,9 @@ def add_to_userlist(chat_id, user_id):
 
 def rm_from_userlist(chat_id, user_id):
     with UR_LOCK:
-        user_filt = SESSION.query(UserRestirect).get((str(chat_id), user_id))
-        if user_filt:
+        if user_filt := SESSION.query(UserRestirect).get(
+            (str(chat_id), user_id)
+        ):
             if user_id in CHAT_USERRESTIRECT.get(str(chat_id), set()):  # sanity check
                 CHAT_USERRESTIRECT.get(str(chat_id), set()).remove(user_id)
 
@@ -157,8 +160,7 @@ def get_chat_userlist(chat_id):
 
 def welcome_security(chat_id):
     try:
-        security = SESSION.query(WelcomeSecurity).get(str(chat_id))
-        if security:
+        if security := SESSION.query(WelcomeSecurity).get(str(chat_id)):
             return security.security, security.mute_time, security.custom_text
         else:
             return False, "0", "Click here to prove you're human"
@@ -182,8 +184,9 @@ def set_welcome_security(chat_id, security, mute_time, custom_text):
 
 def clean_service(chat_id: Union[str, int]) -> bool:
     try:
-        chat_setting = SESSION.query(CleanServiceSetting).get(str(chat_id))
-        if chat_setting:
+        if chat_setting := SESSION.query(CleanServiceSetting).get(
+            str(chat_id)
+        ):
             return chat_setting.clean_service
         return False
     finally:
@@ -237,10 +240,7 @@ def get_clean_pref(chat_id):
     welc = SESSION.query(Welcome).get(str(chat_id))
     SESSION.close()
 
-    if welc:
-        return welc.clean_welcome
-
-    return False
+    return welc.clean_welcome if welc else False
 
 
 def set_welc_preference(chat_id, should_welcome):
@@ -369,8 +369,7 @@ def get_gdbye_buttons(chat_id):
 
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
-        chat = SESSION.query(Welcome).get(str(old_chat_id))
-        if chat:
+        if chat := SESSION.query(Welcome).get(str(old_chat_id)):
             chat.chat_id = str(new_chat_id)
 
         with WELC_BTN_LOCK:

@@ -15,21 +15,21 @@ from haruka.modules.helper_funcs.extraction import extract_user
 @run_async
 def about_me(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
-    user_id = extract_user(message, args)
-
-    if user_id:
+    if user_id := extract_user(message, args):
         user = bot.get_chat(user_id)
     else:
         user = message.from_user
 
-    info = sql.get_user_me_info(user.id)
-
-    if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.first_name, escape_markdown(info)),
-                                            parse_mode=ParseMode.MARKDOWN)
+    if info := sql.get_user_me_info(user.id):
+        update.effective_message.reply_text(
+            f"*{user.first_name}*:\n{escape_markdown(info)}",
+            parse_mode=ParseMode.MARKDOWN,
+        )
     elif message.reply_to_message:
         username = message.reply_to_message.from_user.first_name
-        update.effective_message.reply_text(username + " hasn't set an info message about themselves  yet!")
+        update.effective_message.reply_text(
+            f"{username} hasn't set an info message about themselves  yet!"
+        )
     else:
         update.effective_message.reply_text("You haven't set an info message about yourself yet!")
 
@@ -37,36 +37,38 @@ def about_me(bot: Bot, update: Update, args: List[str]):
 @run_async
 def set_about_me(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]
-    user_id = message.from_user.id
     text = message.text
     info = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
     if len(info) == 2:
         if len(info[1]) < MAX_MESSAGE_LENGTH // 4:
+            user_id = message.from_user.id
             sql.set_user_me_info(user_id, info[1])
             message.reply_text("Updated your info!")
         else:
             message.reply_text(
-                "Your info needs to be under {} characters! You have {}.".format(MAX_MESSAGE_LENGTH // 4, len(info[1])))
+                f"Your info needs to be under {MAX_MESSAGE_LENGTH // 4} characters! You have {len(info[1])}."
+            )
 
 
 @run_async
 def about_bio(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
 
-    user_id = extract_user(message, args)
-    if user_id:
+    if user_id := extract_user(message, args):
         user = bot.get_chat(user_id)
     else:
         user = message.from_user
 
-    info = sql.get_user_bio(user.id)
-
-    if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.first_name, escape_markdown(info)),
-                                            parse_mode=ParseMode.MARKDOWN)
+    if info := sql.get_user_bio(user.id):
+        update.effective_message.reply_text(
+            f"*{user.first_name}*:\n{escape_markdown(info)}",
+            parse_mode=ParseMode.MARKDOWN,
+        )
     elif message.reply_to_message:
         username = user.first_name
-        update.effective_message.reply_text("{} hasn't had a message set about themselves yet!".format(username))
+        update.effective_message.reply_text(
+            f"{username} hasn't had a message set about themselves yet!"
+        )
     else:
         update.effective_message.reply_text("You haven't had a bio set about yourself yet!")
 
@@ -96,11 +98,11 @@ def set_about_bio(bot: Bot, update: Update):
         if len(bio) == 2:
             if len(bio[1]) < MAX_MESSAGE_LENGTH // 4:
                 sql.set_user_bio(user_id, bio[1])
-                message.reply_text("Updated {}'s bio!".format(repl_message.from_user.first_name))
+                message.reply_text(f"Updated {repl_message.from_user.first_name}'s bio!")
             else:
                 message.reply_text(
-                    "A bio needs to be under {} characters! You tried to set {}.".format(
-                        MAX_MESSAGE_LENGTH // 4, len(bio[1])))
+                    f"A bio needs to be under {MAX_MESSAGE_LENGTH // 4} characters! You tried to set {len(bio[1])}."
+                )
     else:
         message.reply_text("Reply to someone's message to set their bio!")
 

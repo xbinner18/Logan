@@ -63,14 +63,13 @@ if is_module_loaded(FILENAME):
         message = update.effective_message  # type: Optional[Message]
         chat = update.effective_chat  # type: Optional[Chat]
 
-        log_channel = sql.get_chat_log_channel(chat.id)
-        if log_channel:
+        if log_channel := sql.get_chat_log_channel(chat.id):
             try:
                 log_channel_info = bot.get_chat(log_channel)
                 message.reply_text(
-                    "This group has all it's logs sent to: {} (`{}`)".format(escape_markdown(log_channel_info.title),
-                                                                             log_channel),
-                    parse_mode=ParseMode.MARKDOWN)
+                    f"This group has all it's logs sent to: {escape_markdown(log_channel_info.title)} (`{log_channel}`)",
+                    parse_mode=ParseMode.MARKDOWN,
+                )
             except:
                 print("Nut")
         else:
@@ -90,9 +89,7 @@ if is_module_loaded(FILENAME):
             try:
                 message.delete()
             except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
+                if excp.message != "Message to delete not found":
                     LOGGER.exception("Error deleting message in log channel. Should work anyway though.")
 
             try:
@@ -120,8 +117,7 @@ if is_module_loaded(FILENAME):
         message = update.effective_message  # type: Optional[Message]
         chat = update.effective_chat  # type: Optional[Chat]
 
-        log_channel = sql.stop_chat_logging(chat.id)
-        if log_channel:
+        if log_channel := sql.stop_chat_logging(chat.id):
             try:
                 bot.send_message(log_channel, tld(chat.id, "Channel has been unlinked from {}").format(chat.title))
                 message.reply_text(tld(chat.id, "Log channel has been un-set."))
@@ -132,7 +128,7 @@ if is_module_loaded(FILENAME):
 
 
     def __stats__():
-        return "{} log channels set.".format(sql.num_logchannels())
+        return f"{sql.num_logchannels()} log channels set."
 
 
     def __migrate__(old_chat_id, new_chat_id):
@@ -140,11 +136,9 @@ if is_module_loaded(FILENAME):
 
 
     def __chat_settings__(bot, update, chat, chatP, user):
-        log_channel = sql.get_chat_log_channel(chat.id)
-        if log_channel:
+        if log_channel := sql.get_chat_log_channel(chat.id):
             log_channel_info = dispatcher.bot.get_chat(log_channel)
-            return "This group has all it's logs sent to: {} (`{}`)".format(escape_markdown(log_channel_info.title),
-                                                                            log_channel)
+            return f"This group has all it's logs sent to: {escape_markdown(log_channel_info.title)} (`{log_channel}`)"
         return "No log channel is set for this group!"
 
 
